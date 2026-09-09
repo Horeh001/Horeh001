@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Horeh — WAEC Study Lab</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--ink:#172033;--muted:#667085;--line:#e5e7eb;--brand:#5b4bdb;--brand2:#7c6cf0;--good:#138a52;--bad:#c0392b}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+button{font:inherit;cursor:pointer}.top{background:#fff;border-bottom:1px solid var(--line);padding:16px 5%;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5}.logo{font-size:24px;font-weight:900;color:var(--brand)}.pill{background:#eeeafe;color:var(--brand);padding:7px 12px;border-radius:999px;font-weight:700}
+.wrap{max-width:1120px;margin:auto;padding:32px 20px 70px}.hero{padding:34px 0}.hero h1{font-size:clamp(36px,6vw,64px);line-height:1;margin:0 0 14px}.hero p{font-size:18px;color:var(--muted);max-width:680px}.actions{display:flex;gap:10px;flex-wrap:wrap}.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:800;background:var(--brand);color:white}.btn.alt{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 5px 18px #1b164a08}.card h3{margin:5px 0 8px}.muted{color:var(--muted)}.tag{display:inline-block;font-size:12px;font-weight:800;background:#f0efff;color:var(--brand);padding:5px 8px;border-radius:8px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;margin-top:18px}.hidden{display:none}.qhead{display:flex;justify-content:space-between;gap:15px}.option{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--line);padding:14px;border-radius:12px;margin:10px 0}.option:hover{border-color:var(--brand)}.option.selected{border:2px solid var(--brand);background:#f6f4ff}.result{padding:14px;border-radius:12px;margin-top:12px}.correct{background:#e9f8f0;color:var(--good)}.wrong{background:#fff0ee;color:var(--bad)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.tab{border:1px solid var(--line);background:#fff;padding:9px 12px;border-radius:10px;font-weight:700}.tab.active{background:var(--brand);color:#fff}
+textarea,input{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;font:inherit}.flash{min-height:180px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:24px;font-weight:800;background:#fafaff}.small{font-size:13px}
+footer{color:var(--muted);text-align:center;margin-top:40px}
+</style>
+</head>
+<body>
+<header class="top"><div class="logo">Horeh<span style="color:#172033">.com</span></div><span class="pill">WAEC Study Lab</span></header>
+<main class="wrap">
+<section id="home">
+<div class="hero"><span class="tag">FIRST WORKING VERSION</span><h1>Study harder.<br>Understand better.</h1><p>Horeh is a WAEC-style practice lab with topic-based tests, instant marking, flashcards and a study assistant interface.</p>
+<div class="actions"><button class="btn" onclick="show('exams')">Start a test</button><button class="btn alt" onclick="show('flashcards')">Make flashcards</button><button class="btn alt" onclick="show('assistant')">Ask Horeh Assistant</button></div></div>
+<h2>Subjects</h2><div id="subjects" class="grid"></div>
+</section>
+
+<section id="exams" class="hidden"><button class="btn alt" onclick="show('home')">← Home</button><div class="panel"><h2 id="examTitle">Choose a subject</h2><div id="topicTabs" class="tabs"></div><div id="examArea"></div></div></section>
+
+<section id="flashcards" class="hidden"><button class="btn alt" onclick="show('home')">← Home</button><div class="panel"><h2>🃏 My Flashcards</h2><p class="muted">Create your own cards and review them.</p><input id="front" placeholder="Front: e.g. What is Newton's second law?"><br><br><textarea id="back" placeholder="Back: e.g. F = ma"></textarea><br><br><button class="btn" onclick="addCard()">Add card</button><div id="cardArea" class="grid" style="margin-top:18px"></div></div></section>
+
+<section id="assistant" class="hidden"><button class="btn alt" onclick="show('home')">← Home</button><div class="panel"><h2>🤖 Horeh Assistant</h2><p class="muted">Prototype interface — connect an AI backend later for real answers.</p><textarea id="ask" rows="5" placeholder="Ask: Explain electrolysis simply..."></textarea><br><br><button class="btn" onclick="askHoreh()">Ask</button><div id="reply" class="panel hidden"></div></div></section>
+<footer>Horeh.com — Independent WAEC-style study platform. Not an official WAEC website.</footer>
+</main>
+<script>
+const data={
+"Mathematics":{topics:["Algebra","Geometry","Trigonometry","Statistics"],qs:[
+["If x + 1/x = 5, find x² + 1/x².","23","24","25","26","A"],
+["A sequence has first term 7 and common difference 4. Find its 15th term.","59","63","67","71","C"],
+["The roots of x² − 7x + k = 0 differ by 1. Find k.","10","12","14","16","D"],
+["A circle has radius 7 cm. Using π=22/7, find its area.","44","154","308","616","B"]]},
+"Physics":{topics:["Mechanics","Waves","Electricity","Heat"],qs:[
+["A particle has displacement y=0.03 sin[6.28(0.50x−50t)]. What is its wave speed?","25 m/s","50 m/s","100 m/s","200 m/s","C"],
+["A 2 kg body changes velocity from 3 m/s to 11 m/s in 4 s. Find the resultant force.","2 N","4 N","6 N","8 N","D"],
+["Two resistors 6 Ω and 3 Ω are connected in parallel. Their effective resistance is:","1 Ω","2 Ω","3 Ω","9 Ω","B"],
+["A wave has frequency 250 Hz and wavelength 1.2 m. Its speed is:","208 m/s","300 m/s","350 m/s","400 m/s","B"]]},
+"Chemistry":{topics:["Atomic Structure","Mole Concept","Organic Chemistry","Acids & Bases"],qs:[
+["Which statement best explains why ionization energy generally increases across a period?","Atoms become larger","Nuclear attraction on outer electrons increases","More shells are added","Shielding always increases","B"],
+["How many moles are present in 11 g of CO₂? (C=12,O=16)","0.10","0.20","0.25","0.50","A"],
+["The major product when propene reacts with HBr under ordinary conditions is:","1-bromopropane","2-bromopropane","propane","propanol","B"],
+["A solution has [H⁺]=1.0×10⁻³ mol dm⁻³. Its pH is:","2","3","10","11","B"]]},
+"Civic Education":{topics:["Citizenship","Democracy","Human Rights","National Values"],qs:[
+["Which is most directly associated with the rule of law?","Government above the law","Equality before the law","Military rule","Suspension of courts","B"],
+["A major purpose of civic participation is to:","Eliminate disagreement","Influence public decisions responsibly","Avoid elections","Replace the constitution","B"],
+["Which is a fundamental democratic principle?","Arbitrary power","Periodic elections","Censorship of all criticism","One-person rule","B"],
+["A citizen's duty to obey lawful authority is best balanced by the right to:","Break laws freely","Demand accountability","Avoid taxes","Reject all public institutions","B"]]},
+"Economics":{topics:["Demand & Supply","Production","Market Structures","National Income"],qs:[
+["If price rises and quantity demanded falls, ceteris paribus, this illustrates:","Increase in demand","Law of demand","Increase in supply","Law of supply","B"],
+["A firm reaches minimum average cost where marginal cost is:","Zero","Equal to average cost","Maximum","Below zero","B"],
+["A market with one seller and high barriers to entry is:","Perfect competition","Monopoly","Oligopoly","Monopolistic competition","B"],
+["GDP measures the market value of:","All intermediate goods","Final goods and services produced within an economy","Only exports","Only government output","B"]]},
+"English Language":{topics:["Lexis","Structure","Comprehension","Oral English"],qs:[
+["Choose the option nearest in meaning to 'meticulous'.","Careless","Thorough","Rapid","Hostile","B"],
+["Neither the teacher nor the students ___ aware of the change.","was","is","were","has been","C"],
+["The expression 'to spill the beans' means to:","Waste food","Reveal a secret","Start an argument","Make a mistake","B"],
+["Choose the word with the same vowel sound as 'seat'.","said","sit","machine","head","C"]]},
+"Technical Drawing":{topics:["Geometry","Orthographic Projection","Solid Geometry","Building Drawing"],qs:[
+["The locus of a point equidistant from two intersecting lines is represented by their:","Parallel lines","Angle bisectors","Tangents","Chords","B"],
+["In first-angle orthographic projection, the object is conceptually placed:","Behind the planes","Between observer and plane","Only above the plane","Outside the projection system","B"],
+["A regular hexagon has each interior angle equal to:","90°","108°","120°","135°","C"],
+["A hidden edge in conventional technical drawing is normally represented by:","A thick continuous line","A thin dashed line","A thick chain line","A freehand line","B"]]}
+};
+let current=null, idx=0, score=0, answers=[], cards=JSON.parse(localStorage.getItem('horehCards')||'[]');
+function show(id){['home','exams','flashcards','assistant'].forEach(x=>document.getElementById(x).classList.toggle('hidden',x!==id));if(id==='flashcards')renderCards();if(id==='exams')buildSubjects();}
+function buildSubjects(){let s=document.getElementById('subjects');s.innerHTML='';Object.entries(data).forEach(([name,d])=>{let c=document.createElement('div');c.className='card';c.innerHTML=`<span class="tag">${d.qs.length} sample questions</span><h3>${name}</h3><p class="muted">${d.topics.join(' • ')}</p><button class="btn" onclick="start('${name}')">Practice</button>`;s.appendChild(c)});}
+function start(name){current=name;idx=0;score=0;answers=[];document.getElementById('examTitle').textContent=name;let t=document.getElementById('topicTabs');t.innerHTML='<button class="tab active">Mixed Challenge</button>'+data[name].topics.map(x=>`<button class="tab" onclick="alert('Topic bank coming next: ${x}')">${x}</button>`).join('');renderQ();}
+function renderQ(){let q=data[current].qs[idx];let letters=['A','B','C','D'];document.getElementById('examArea').innerHTML=`<div class="qhead"><h3>Question ${idx+1} of ${data[current].qs.length}</h3><strong>${score} correct</strong></div><p style="font-size:19px">${q[0]}</p>${letters.map((l,i)=>`<button class="option" onclick="choose('${l}',this)"><b>${l}.</b> ${q[i+1]}</button>`).join('')}<div id="feedback"></div>`}
+function choose(letter,el){if(answers[idx])return;answers[idx]=letter;let q=data[current].qs[idx],fb=document.getElementById('feedback');if(letter===q[5]){score++;fb.innerHTML='<div class="result correct">✓ Correct. '+q[5]+'.</div>'}else fb.innerHTML='<div class="result wrong">✗ Not quite. Correct answer: '+q[5]+'.</div>';document.querySelectorAll('.option').forEach(x=>x.disabled=true);setTimeout(()=>{idx++;if(idx<data[current].qs.length)renderQ();else finish()},700)}
+function finish(){document.getElementById('examArea').innerHTML=`<div class="card"><h2>Test complete 🎉</h2><p style="font-size:30px;font-weight:900">${score}/${data[current].qs.length}</p><p>You can retake the test or choose another subject.</p><button class="btn" onclick="start('${current}')">Retake</button> <button class="btn alt" onclick="show('home')">Subjects</button></div>`}
+function addCard(){let f=document.getElementById('front').value.trim(),b=document.getElementById('back').value.trim();if(!f||!b)return;cards.push({f,b});localStorage.setItem('horehCards',JSON.stringify(cards));document.getElementById('front').value='';document.getElementById('back').value='';renderCards()}
+function renderCards(){let a=document.getElementById('cardArea');a.innerHTML=cards.length?cards.map((c,i)=>`<div class="card"><div class="flash" onclick="this.innerHTML='<span>${escapeHtml(c.b)}</span>'">${escapeHtml(c.f)}</div><button class="btn alt" onclick="cards.splice(${i},1);localStorage.setItem('horehCards',JSON.stringify(cards));renderCards()">Delete</button></div>`).join(''):'<p class="muted">No cards yet.</p>'}
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function askHoreh(){let x=document.getElementById('ask').value.trim();let r=document.getElementById('reply');r.classList.remove('hidden');r.innerHTML='<b>Horeh Assistant (prototype)</b><p>I can help break a topic into steps, give hints, create practice questions and explain answers. A live AI backend is the next integration.</p><p><b>Your question:</b> '+escapeHtml(x)+'</p>'}
+buildSubjects();
+</script>
+</body>
+</html>
